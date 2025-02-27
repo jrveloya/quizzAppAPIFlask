@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from .models import db, User, Quiz, Question, Participant
 from .config import Config
 
-routes = Blueprint("routes", __name__)  # FIX: Using Blueprint
+routes = Blueprint("routes", __name__)
 
 # Helper function to check API key
 def check_api_key():
