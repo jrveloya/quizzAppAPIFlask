@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Quiz Participants</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h2>Participants for Quiz ID: {{ quiz_id }}</h2>
+
+    {% if participants %}
+        <ul>
+            {% for participant in participants %}
+                <li>{{ participant.name }} - Score: {{ participant.score }}%</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No participants found for this quiz.</p>
+    {% endif %}
+
+    <a href="/dashboard" class="btn">Back to Dashboard</a>
+</body>
+</html>

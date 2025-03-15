@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Take Quiz</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h2>Take Quiz</h2>
+
+    <form id="submit-quiz-form">
+        <input type="hidden" id="quizId" value="{{ quiz.id }}">
+
+        {% for question in questions %}
+            <div class="quiz-item">
+                <p><strong>{{ question.question_text }}</strong></p>
+
+                {% if question.question_type == 'MC' %}
+                    {% for option in question.options %}
+                        <label>
+                            <input type="radio" name="question_{{ question.id }}" value="{{ option }}" required>
+                            {{ option }}
+                        </label><br>
+                    {% endfor %}
+
+                {% elif question.question_type == 'TF' %}
+                    <label>
+                        <input type="radio" name="question_{{ question.id }}" value="True" required> True
+                    </label><br>
+                    <label>
+                        <input type="radio" name="question_{{ question.id }}" value="False" required> False
+                    </label><br>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <button type="submit" class="btn">Submit Quiz</button>
+    </form>
+
+    <p id="response-message"></p>
+
+    <script src="{{ url_for('static', filename='script.js') }}?v=1"></script>
+</body>
+</html>

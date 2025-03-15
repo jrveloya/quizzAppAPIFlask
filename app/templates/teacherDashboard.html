@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Teacher Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h2>Welcome, {{ teacher_name }}</h2>
+
+    <h3>Your Quizzes:</h3>
+    <ul>
+        {% for quiz in quizzes %}
+            <li>
+                <strong>{{ quiz.name }}</strong> 
+                - <a href="{{ url_for('routes.view_participants', quiz_id=quiz.id) }}">View Participants</a>
+            </li>
+        {% else %}
+            <p>No quizzes found.</p>
+        {% endfor %}
+    </ul>
+
+    <a href="/create_quiz" class="btn">Create New Quiz</a>
+    <button id="logout-btn" class="btn">Logout</button>
+
+    <script src="{{ url_for('static', filename='script.js') }}?v=1"></script>
+</body>
+</html>
