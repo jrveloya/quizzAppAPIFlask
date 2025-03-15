@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Teacher Sign Up</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h2>Teacher Sign Up</h2>
+
+    <form id="signup-form">
+        <input type="text" id="name" placeholder="Your Name" required>
+        <input type="email" id="email" placeholder="Your Email" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <input type="hidden" id="role" value="teacher">
+        <button type="submit" class="btn">Sign Up</button>
+    </form>
+
+    <p id="response-message"></p>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

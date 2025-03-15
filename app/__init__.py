@@ -8,6 +8,7 @@ from .routes import routes
 app = Flask(__name__)
 app.config.from_object(Config)
 db.init_app(app)
+app.secret_key = Config.SECRET_KEY
 
 
 limiter = Limiter(

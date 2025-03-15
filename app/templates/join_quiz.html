@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Join Quiz</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h2>Join a Quiz</h2>
+
+    <form id="join-quiz-form">
+        <input type="text" id="quizCode" placeholder="Quiz Code" required>
+        <input type="text" id="studentName" placeholder="Your Name" required>
+        <button type="submit" class="btn">Join Quiz</button>
+        <!-- <a href="/join_quiz" class="btn">Join Quiz</a> -->
+    </form>
+
+    <p id="response-message"></p>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
