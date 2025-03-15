@@ -1,27 +1,13 @@
 # Quiz API
 
-I have left test cases for you to run. To summarize, they are enumerated below:
-
-1. test_create_user
-   - Verifies that a user (teacher or student) can be created successfully.
-
-2. test_create_quiz
-   - Ensures that a teacher can create a quiz when providing a valid API key.
-
-3. test_create_quiz_unauthorized
-   - Ensures that quiz creation fails if the API key is missing or incorrect.
-
-4. test_add_question
-   - Confirms that a teacher can add a question to a quiz using the API key.
-
-5. test_add_question_unauthorized
-   - Ensures that adding a question fails if the API key is missing or incorrect.
-
-6. test_get_quizzes
-   - Retrieves all available quizzes and verifies the response.
-
-7. test_add_participant
-   - Ensures that a student can take a quiz and have their score recorded.
-
-8. test_get_participants
-   - Verifies that a teacher can retrieve the list of students who took a quiz.
+#Update from 03/14/2025 @ 7:30 PM PST
+I added the frontend for the project. There are multiple additions to the program:
+1. Added a sign up function for teachers.
+2. Added an add quiz page (not yet available, but accessible to only teachers)
+3. Students can now join a quiz and answer questions with only the Quiz code.
+4. DB will now store all quiz information including participants and questions
+## Currently, I am working on:
+1. Adding functionality to teacher side
+2. Adding a teacher dashboard, displaying all quiz data and allowing them to create a new quiz
+3. Login/logout function
+4. Sign up page and routes
