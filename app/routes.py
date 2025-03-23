@@ -167,7 +167,7 @@ def get_participants(quiz_id):
     if not participants:
         return jsonify({"message" : "No participants found"}), 404
     
-    participant_list = [{"student_id" : p.student_id, "score" : p.score} for p in participants]
+    participant_list = [{"name" : p.name, "score" : p.score} for p in participants]
     return jsonify(participant_list), 200
 
 @routes.route("/join_quiz", methods=["GET", "POST"])

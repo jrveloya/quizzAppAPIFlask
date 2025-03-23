@@ -1,0 +1,153 @@
+{
+	"info": {
+		"_postman_id": "8b52efc9-5547-4666-b872-8d6e10dedb67",
+		"name": "Flask Quiz API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "43025044"
+	},
+	"item": [
+		{
+			"name": "Sign Up (Teacher)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Alice\",\n  \"email\": \"alice@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"teacher\"\n}"
+				},
+				"url": "http://127.0.0.1:5000/signup"
+			},
+			"response": []
+		},
+		{
+			"name": "Login (Teacher)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"alice@example.com\",\n  \"password\": \"password123\"\n}"
+				},
+				"url": "http://127.0.0.1:5000/login"
+			},
+			"response": []
+		},
+		{
+			"name": "Create Quiz",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "X-API-KEY",
+						"value": "SECRET_API_KEY_1234"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Python Basics\",\n  \"teacher_id\": 1,\n  \"quiz_code\" : \"ABC123\"\n}"
+				},
+				"url": "http://127.0.0.1:5000/quizzes"
+			},
+			"response": []
+		},
+		{
+			"name": "Add Question",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "X-API-KEY",
+						"value": "SECRET_API_KEY_1234"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"question_text\": \"What does Flask use to manage routes?\",\n  \"question_type\": \"MC\",\n  \"options\": [\"Django\", \"Blueprint\", \"Vue\", \"Express\"],\n  \"answer\": \"Blueprint\"\n}"
+				},
+				"url": "http://127.0.0.1/quizzes/1/questions"
+			},
+			"response": []
+		},
+		{
+			"name": "Join Quiz (Student)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"quiz_code\": \"ABC123\",\n  \"name\": \"Bob\"\n}"
+				},
+				"url": "http://127.0.0.1:5000/join_quiz"
+			},
+			"response": []
+		},
+		{
+			"name": "Submit Quiz",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"answers\": {\n    \"1\": \"Blueprint\"\n  }\n}"
+				},
+				"url": "http://127.0.0.1/quizzes/1/submit"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Quizzes",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://127.0.0.1:5000/quizzes"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Questions for Quiz",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://127.0.0.1:5000/quizzes/1/questions"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Participants",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://127.0.0.1:5000/quizzes/1/participants"
+			},
+			"response": []
+		}
+	]
+}

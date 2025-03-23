@@ -13,7 +13,7 @@
         {% for quiz in quizzes %}
             <li>
                 <strong>{{ quiz.name }}</strong> 
-                - <a href="{{ url_for('routes.view_participants', quiz_id=quiz.id) }}">View Participants</a>
+                - <a href="{{ url_for('routes.get_participants', quiz_id=quiz.id) }}">View Participants</a>
             </li>
         {% else %}
             <p>No quizzes found.</p>
