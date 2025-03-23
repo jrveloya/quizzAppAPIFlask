@@ -50,5 +50,5 @@ def insert_test_data():
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
-        insert_test_data()
+        # insert_test_data()
     app.run(debug=True)
