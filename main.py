@@ -3,8 +3,6 @@ from app import app, db
 from app.models import User, Quiz, Question
 import hashlib
 import os
-import random
-import string
 
 def insert_test_data():
     if not User.query.filter_by(email="teacher@example.com").first():
@@ -50,5 +48,5 @@ def insert_test_data():
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
-        # insert_test_data()
+        insert_test_data()
     app.run(debug=True)
