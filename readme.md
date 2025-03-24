@@ -39,16 +39,16 @@ The Flask Quiz API is a web application that allows teachers to create and manag
 To run this project locally, follow these steps:
 
 1. **Clone the repository:**
-`git clone https://github.com/yourusername/flask-quiz-api.git`
+`git clone https://github.com/jrveloya/quizzAppAPIFlask.git`
 2. **Build the Docker image:**
-`docker run -p 5000:5000 flask-quiz-api`
+`docker run -p 5000:5000 quiz-app`
 
 ## Deployment on AWS EC2
 1. **Set up an EC2 instance** with Docker installed.
 2. **Pull the Docker image from Docker Hub:**
-`docker pull yourusername/flask-quiz-api`
+`docker pull jrveloya/quiz-app`
 3. **Run the Docker container on the EC2 instance:**
-`docker run -d -p 80:5000 yourusername/flask-quiz-api`
+`docker run -d -p 80:5000 jrveloya/quiz-app`
 
 ## Security Implementations
 
