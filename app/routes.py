@@ -1,4 +1,5 @@
-from flask import Blueprint, request, jsonify, render_template, session, url_for
+from flask import Blueprint, redirect, request, jsonify, render_template, session, url_for, make_response
+from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token, set_access_cookies, unset_jwt_cookies
 from .models import db, User, Quiz, Question, Participant
 from .config import Config
 import json
@@ -27,23 +28,39 @@ def create_user():
     db.session.commit()
     return jsonify({"message": "User created"}), 201
 
-@routes.route("/quizzes", methods=["POST"])
+@routes.route("/create_quiz", methods=["GET", "POST"])
+@jwt_required()
 def create_quiz():
-    """
-    Creates a quiz -- api for teacher only
-    """
-    auth_error = check_api_key()
-    if auth_error:
-        return auth_error
+    if request.method == "GET":
+        return render_template("create_quiz.html")
 
-    data = request.get_json()
-    quiz_code = generate_quiz_code()
-    
-    quiz = Quiz(name=data["name"], teacher_id=data["teacher_id"], quiz_code=quiz_code)
-    db.session.add(quiz)
-    db.session.commit()
-    return jsonify({"message": "Quiz created",
-                    "quiz_code" : quiz_code}), 201
+    elif request.method == "POST":
+        data = request.get_json()
+        name = data.get("name")
+        teacher_id = get_jwt_identity()
+        questions = data.get("questions", [])
+
+        quiz_code = generate_quiz_code()
+        quiz = Quiz(name=name, teacher_id=teacher_id, quiz_code=quiz_code)
+        db.session.add(quiz)
+        db.session.commit()
+
+        for q in questions:
+            question = Question(
+                quiz_id=quiz.id,
+                question_text=q["question_text"],
+                question_type=q["question_type"],
+                options=json.dumps(q["options"]),
+                answer=q["answer"]
+            )
+            db.session.add(question)
+
+        db.session.commit()
+
+        return jsonify({
+            "message": "Quiz created",
+            "quiz_code": quiz.quiz_code
+        }), 201
 
 @routes.route("/quizzes/<int:quiz_id>/questions", methods=["POST"])
 def add_question(quiz_id):
@@ -173,98 +190,99 @@ def get_participants(quiz_id):
 @routes.route("/join_quiz", methods=["GET", "POST"])
 def join_quiz():
     if request.method == "GET":
-        # Serve the join quiz page
         return render_template("join_quiz.html")
-    
+
     elif request.method == "POST":
-        data = request.get_json()
-        quiz_code = data.get("quiz_code")
-        name = data.get("name")
+        quiz_code = request.form.get("quiz_code")
+        name = request.form.get("name")
 
         if not quiz_code or not name:
             return jsonify({"error": "Quiz code and name are required."}), 400
 
-        # Check if the quiz exists
         quiz = Quiz.query.filter_by(quiz_code=quiz_code).first()
         if not quiz:
             return jsonify({"error": "Invalid quiz code."}), 404
 
-        # Store participant information in session
         session["quiz_id"] = quiz.id
         session["participant_name"] = name
 
-        # Check if participant already exists
         existing_participant = Participant.query.filter_by(quiz_id=quiz.id, name=name).first()
         if not existing_participant:
             participant = Participant(quiz_id=quiz.id, name=name)
             db.session.add(participant)
             db.session.commit()
 
-        # Return the redirect URL to the quiz page
-        return jsonify({
-            "message": "Joined quiz successfully. Redirecting...",
-            "redirect_url": f"/take_quiz/{quiz.id}"
-        }), 200
-
+        return redirect(f"/take_quiz/{quiz.id}")
+    
 @routes.route("/signup", methods=["GET", "POST"])
 def signup():
     if request.method == "GET":
-        # Serve the signup page
         return render_template("signup.html")
 
     elif request.method == "POST":
-        # Process the signup form submission
-        data = request.get_json()
-        name = data.get("name")
-        email = data.get("email")
-        password = data.get("password")
-        role = data.get("role")
+        username = request.form.get("username")
+        email = request.form.get("email")
+        password = request.form.get("password")
 
-        # Validate inputs
-        if not name or not email or not password or not role:
-            return jsonify({"error": "All fields (name, email, password, role) are required."}), 400
+        # Set role to 'teacher' by default or via hidden field
+        role = "teacher"
 
-        if role.lower() != "teacher":
-            return jsonify({"error": "Only teachers can sign up."}), 400
+        if not username or not email or not password:
+            return jsonify({"error": "All fields are required."}), 400
 
         if User.query.filter_by(email=email).first():
             return jsonify({"error": "Email already exists."}), 400
 
-        # Create and save the user with hashed password
-        user = User(name=name, email=email, role=role.lower())
+        user = User(name=username, email=email, role=role)
         user.set_password(password)
 
         db.session.add(user)
         db.session.commit()
 
-        return jsonify({"message": "Teacher signed up successfully", "user_id": user.id}), 201
+        return redirect(url_for("teacher_dashboard"))
         
 @routes.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "GET":
         return render_template("login.html")
-    
-    elif request.method == "POST":
-        data = request.get_json()
-        email = data.get("email")
-        password = data.get("password")
 
-        if not email or not password:
-            return jsonify({"error": "Email and password are required."}), 400
+    elif request.method == "POST":
+        email = request.form.get("email")
+        password = request.form.get("password")
 
         user = User.query.filter_by(email=email).first()
         if user and user.verify_password(password):
-            session["user_id"] = user.id
-            session["user_name"] = user.name
-            return jsonify({"message": "Login successful"}), 200
+            access_token = create_access_token(identity=str(user.id))
+            
+            response = make_response(redirect(url_for('routes.dashboard')))
+            set_access_cookies(response, access_token)
 
-        return jsonify({"error": "Invalid email or password"}), 401
+            return response
+
+        return render_template("login.html", error="Invalid credentials.")
     
+
+
 @routes.route("/logout", methods=["POST"])
 def logout():
-    db.session.clear()
-    return jsonify({"message": "Logged out successfully"}), 200
+    response = redirect("/")
+    unset_jwt_cookies(response)
+    session.clear()
+    return response
 
 @routes.route("/")
 def home():
     return render_template("index.html")
+
+@routes.route('/dashboard', methods=['GET'])
+@jwt_required()
+def dashboard():
+    user_id = int(get_jwt_identity())
+    user = User.query.get(user_id)
+
+    if not user or user.role != 'teacher':
+        return render_template('dashboard.html', quizzes=[], user=None)
+
+    quizzes = Quiz.query.filter_by(teacher_id=user.id).all()
+
+    return render_template('dashboard.html', quizzes=quizzes, user=user)

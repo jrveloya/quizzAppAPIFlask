@@ -40,33 +40,48 @@ def test_get_questions(client):
     assert questions[0]["question_text"] == "What is the capital of France?"
 
 def test_join_and_submit_quiz(client):
-    # --- Test Joining the Quiz ---
+    from app.models import Quiz, Question, Participant
+
+    # --- Step 1: Dynamically fetch quiz and its questions ---
+    with client.application.app_context():
+        quiz = Quiz.query.filter_by(quiz_code="123456").first()
+        assert quiz is not None
+        quiz_id = quiz.id
+
+        questions = Question.query.filter_by(quiz_id=quiz_id).all()
+        assert len(questions) == 2
+
+        # Create answer payload using correct answers
+        answers = {str(q.id): q.answer for q in questions}
+
+    # --- Step 2: Join Quiz ---
     join_payload = {
-        "quiz_code": "123456",  # This should match the dummy quiz code from insert_test_data()
+        "quiz_code": "123456",
         "name": "Student1"
     }
-    join_response = client.post("/join_quiz", json=join_payload)
-    assert join_response.status_code == 200
-    join_data = join_response.get_json()
-    # Check that we received a redirect URL in the response
-    assert "redirect_url" in join_data
-    assert join_data["message"].startswith("Joined quiz successfully")
-    
-    # Simulate that the student's name is stored in the session for quiz submission
+
+    # Simulate a session for the participant
+    join_response = client.post("/join_quiz", data=join_payload)
+    assert join_response.status_code in (200, 302)  # Allow 302 for redirect
+
+    # --- Step 3: Simulate session for submission ---
     with client.session_transaction() as sess:
         sess["participant_name"] = "Student1"
-        sess["quiz_id"] = 1
+        sess["quiz_id"] = quiz_id
 
-    # --- Test Submitting the Quiz ---
+    # --- Step 4: Submit Quiz ---
     submit_payload = {
-        "answers": {
-            "1": "Paris",  # Correct answer for question 1
-            "2": "True"    # Correct answer for question 2
-        }
+        "answers": answers
     }
-    submit_response = client.post("/quizzes/1/submit", json=submit_payload)
+
+    submit_response = client.post(f"/quizzes/{quiz_id}/submit", json=submit_payload)
     assert submit_response.status_code == 201
     submit_data = submit_response.get_json()
     assert "score" in submit_data
-    # Assuming both questions are answered correctly, score should be 100%
     assert submit_data["score"] == 100.0
+
+    # --- Step 5: Confirm participant exists and scored correctly ---
+    with client.application.app_context():
+        participant = Participant.query.filter_by(quiz_id=quiz_id, name="Student1").first()
+        assert participant is not None
+        assert participant.score == 100

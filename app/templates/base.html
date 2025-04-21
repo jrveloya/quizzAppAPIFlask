@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Quiz App{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="navbar-container">
+        <a href="/" class="navbar-brand">📘 Quiz App</a>
+        <ul class="navbar-links">
+            <li><a href="/join_quiz" class="nav-link">Join Quiz</a></li>
+
+            {% if current_user %}
+                <li><a href="/dashboard" class="nav-link">Dashboard</a></li>
+                <li><a href="/create_quiz" class="nav-link">Create Quiz</a></li>
+                <li>
+                    <form action="/logout" method="POST" style="display:inline;">
+                        <button type="submit" class="nav-link">Log Out</button>
+                    </form>
+                </li>
+            {% else %}
+                <li><a href="/signup" class="nav-link">Sign Up</a></li>
+                <li><a href="/login" class="nav-link">Log In</a></li>
+            {% endif %}
+        </ul>
+    </div>
+</nav>
+
+<!-- Global Error Message -->
+{% if error %}
+    <div class="error-banner">
+        {{ error }}
+    </div>
+{% endif %}
+
+<!-- Page Content -->
+<main>
+    {% block content %}
+    {% endblock %}
+</main>
+{% block scripts %}
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+{% endblock %}
+</body>
+</html>

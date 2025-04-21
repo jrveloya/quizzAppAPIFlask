@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<h2>Welcome, {{ user.name }}!</h2>
+
+{% if quizzes %}
+    <h3>Your Quizzes</h3>
+    <ul>
+        {% for quiz in quizzes %}
+        <li>
+            {{ quiz.name }} (Code: {{ quiz.quiz_code }})
+            <button data-quiz-id="{{ quiz.id }}">View Participants</button>
+            <div id="participants-{{ quiz.id }}" style="display: none;"></div>
+        </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>You haven't created any quizzes yet.</p>
+{% endif %}
+{% endblock %}
