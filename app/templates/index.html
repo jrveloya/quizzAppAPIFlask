@@ -1,28 +1,17 @@
-<!DOCTYPE html>
-<head>
-    <meta charset="UTF-8">
-    <title>Quiz App Home</title>
-    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
-</head>
-<body>
-    <h1>Welcome to the Quiz App API</h1>
-    <!-- Will remove the disable class btn once feature is finished and functional -->
-    <div class="container">
-        <a href="/join_quiz" class="btn">Join Quiz</a>
-        <button 
-        //href="/signup" 
-        class="btn disabled-btn" disabled> Sign Up</button>
-        <button 
-        //href="/login" 
-        class="btn disabled-btn" disabled>Log-in</button>
-        <button 
-        //href="/logout" 
-        class="btn disabled-btn" disabled>Logout</button>
-    </div>
-    <div class="container">
-        <p>
-            Other features disabled for now to satisfy front end deliverable. <br> Please use the following credentials to join a quiz: <br>
-            Quiz Code: 123456
-        </p>
-    </div>
-</body>
+{% extends "base.html" %}
+
+{% block title %}Home - Quiz App{% endblock %}
+
+{% block content %}
+<h1>Welcome to the Quiz App API</h1>
+<!-- Will remove the disable class btn once feature is finished and functional -->
+<div class="container">
+    <a href="/join_quiz" class="btn">Join Quiz</a>
+</div>
+<div class="container">
+     <p>
+         Please use the following credentials to join a quiz (for testing): <br>
+        Quiz Code: 123456
+    </p>
+</div>
+{% endblock %}

@@ -1,39 +1,94 @@
 document.addEventListener('DOMContentLoaded', () => {
-
-    // Create Quiz (Teacher Only)
+    // ==========================
+    // CREATE QUIZ (TEACHER)
+    // ==========================
     const quizForm = document.getElementById('create-quiz-form');
+    const questionContainer = document.getElementById('question-container');
+    const addQuestionBtn = document.getElementById('add-question-btn');
+    let questionIndex = 0;
+
+    function createQuestionBlock(index) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'question-block';
+        wrapper.dataset.index = index;
+
+        wrapper.innerHTML = `
+            <hr>
+            <label>Question:</label>
+            <input type="text" name="question_text_${index}" required>
+
+            <label>Type:</label>
+            <select name="question_type_${index}">
+                <option value="MC">Multiple Choice</option>
+                <option value="TF">True/False</option>
+            </select>
+
+            <label>Options (comma separated):</label>
+            <input type="text" name="options_${index}">
+
+            <label>Answer:</label>
+            <input type="text" name="answer_${index}" required>
+
+            <button type="button" class="remove-question-btn">− Remove</button>
+        `;
+
+        wrapper.querySelector('.remove-question-btn').addEventListener('click', () => {
+            wrapper.remove();
+        });
+
+        return wrapper;
+    }
+
+    if (addQuestionBtn) {
+        addQuestionBtn.addEventListener('click', () => {
+            const block = createQuestionBlock(questionIndex++);
+            questionContainer.appendChild(block);
+        });
+    }
+
     if (quizForm) {
         quizForm.addEventListener('submit', function (event) {
             event.preventDefault();
 
             const name = document.getElementById('quizName').value;
-            const teacherId = document.getElementById('teacherId').value;
+            const questionBlocks = document.querySelectorAll('.question-block');
 
-            fetch('/quizzes', {
+            const questions = Array.from(questionBlocks).map(block => {
+                const index = block.dataset.index;
+                return {
+                    question_text: block.querySelector(`[name="question_text_${index}"]`).value,
+                    question_type: block.querySelector(`[name="question_type_${index}"]`).value,
+                    options: block.querySelector(`[name="options_${index}"]`).value.split(',').map(opt => opt.trim()),
+                    answer: block.querySelector(`[name="answer_${index}"]`).value
+                };
+            });
+
+            fetch('/create_quiz', {
                 method: 'POST',
-                headers: { 
-                    'X-API-KEY': 'SECRET_API_KEY_1234',
-                    'Content-Type': 'application/json'
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-API-KEY': 'SECRET_API_KEY_1234'
                 },
-                body: JSON.stringify({ name, teacher_id: teacherId })
+                body: JSON.stringify({ name, questions })
             })
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
-                const responseMessage = document.getElementById('response-message');
-                responseMessage.textContent = data.quiz_code 
-                    ? `Quiz Created. Code: ${data.quiz_code}`
-                    : (data.error || "An unexpected error occurred.");
-                responseMessage.style.color = data.error ? 'red' : 'green';
+                const message = document.getElementById('response-message');
+                message.textContent = data.message || "Quiz submitted.";
+                message.style.color = data.error ? 'red' : 'green';
             })
-            .catch(error => {
-                console.error('Error creating quiz:', error);
-                document.getElementById('response-message').textContent = "An unexpected error occurred.";
-                document.getElementById('response-message').style.color = "red";
+            .catch(err => {
+                console.error(err);
+                const message = document.getElementById('response-message');
+                message.textContent = "An unexpected error occurred.";
+                message.style.color = 'red';
             });
         });
     }
 
-    // Join Quiz (Student)
+    // ==========================
+    // JOIN QUIZ (STUDENT)
+    // ==========================
     const joinQuizForm = document.getElementById('join-quiz-form');
     if (joinQuizForm) {
         joinQuizForm.addEventListener('submit', function (event) {
@@ -50,9 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ quiz_code: quizCode, name })
             })
             .then(response => {
-                if (!response.ok) {
-                    return response.json().then(err => { throw err; });
-                }
+                if (!response.ok) return response.json().then(err => { throw err; });
                 return response.json();
             })
             .then(data => {
@@ -68,12 +121,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const responseMessage = document.getElementById('response-message');
                 responseMessage.textContent = error.error || "An unexpected error occurred.";
                 responseMessage.style.color = "red";
-                console.error('Error joining quiz:', error);
             });
         });
     }
 
-    // Submit Quiz (Student)
+    // ==========================
+    // SUBMIT QUIZ (STUDENT)
+    // ==========================
     const submitQuizForm = document.getElementById('submit-quiz-form');
     if (submitQuizForm) {
         submitQuizForm.addEventListener('submit', function (event) {
@@ -90,15 +144,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             fetch(`/quizzes/${quizId}/submit`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ answers })
             })
             .then(response => {
-                if (!response.ok) {
-                    return response.json().then(err => { throw err; });
-                }
+                if (!response.ok) return response.json().then(err => { throw err; });
                 return response.json();
             })
             .then(data => {
@@ -115,7 +165,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Handle Teacher Signup
+    // ==========================
+    // SIGNUP
+    // ==========================
     const signupForm = document.getElementById('signup-form');
     if (signupForm) {
         signupForm.addEventListener('submit', function (event) {
@@ -140,7 +192,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Handle Teacher Login
+    // ==========================
+    // LOGIN
+    // ==========================
     const loginForm = document.getElementById('login-form');
     if (loginForm) {
         loginForm.addEventListener('submit', function (event) {
@@ -155,16 +209,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ email, password })
             })
             .then(response => {
-                if (!response.ok) {
-                    return response.json().then(err => { throw err; });
-                }
+                if (!response.ok) return response.json().then(err => { throw err; });
                 return response.json();
             })
             .then(data => {
                 document.getElementById('response-message').textContent = data.message;
                 document.getElementById('response-message').style.color = 'green';
                 setTimeout(() => {
-                    window.location.href = '/';
+                    window.location.href = '/dashboard';
                 }, 1000);
             })
             .catch(error => {
@@ -174,7 +226,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Handle Logout
+    // ==========================
+    // LOGOUT
+    // ==========================
     const logoutButton = document.getElementById('logout-btn');
     if (logoutButton) {
         logoutButton.addEventListener('click', function () {
@@ -190,4 +244,39 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // ==========================
+    // VIEW PARTICIPANTS
+    // ==========================
+    const participantButtons = document.querySelectorAll('[data-quiz-id]');
+    participantButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const quizId = button.dataset.quizId;
+            const container = document.getElementById(`participants-${quizId}`);
+
+            if (container.style.display === 'block') {
+                container.style.display = 'none';
+                container.innerHTML = '';
+                return;
+            }
+
+            fetch(`/quizzes/${quizId}/participants`)
+                .then(response => {
+                    if (!response.ok) throw new Error("No participants found.");
+                    return response.json();
+                })
+                .then(data => {
+                    if (!data.length) {
+                        container.innerHTML = "<p>No participants yet.</p>";
+                    } else {
+                        const list = data.map(p => `<li>${p.name} - Score: ${p.score}</li>`).join('');
+                        container.innerHTML = `<ul>${list}</ul>`;
+                    }
+                    container.style.display = 'block';
+                })
+                .catch(error => {
+                    container.innerHTML = `<p style="color:red;">${error.message}</p>`;
+                    container.style.display = 'block';
+                });
+        });
+    });
 });
