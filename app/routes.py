@@ -261,8 +261,6 @@ def login():
 
         return render_template("login.html", error="Invalid credentials.")
     
-
-
 @routes.route("/logout", methods=["POST"])
 def logout():
     response = redirect("/")
