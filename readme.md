@@ -1,4 +1,6 @@
-# Flask Quiz API
+from pathlib import Path
+
+readme_content = """# Flask Quiz API
 
 ## Overview
 
@@ -15,24 +17,88 @@ The Flask Quiz API is a web application that allows teachers to create and manag
 
 ### Authentication
 
-- **POST /signup** - Registers a new teacher with email and password.
-- **POST /login** - Authenticates a teacher and creates a session.
-- **POST /logout** - Destroys the session and logs out the user.
+- **POST /signup**
+    - Registers a new teacher with email and password.
+    - Example:
+    ```json
+    {
+      "name": "Alice",
+      "email": "alice@example.com",
+      "password": "password123",
+      "role": "teacher"
+    }
+    ```
+
+- **POST /login**
+    - Authenticates a teacher and creates a session.
+    - Example:
+    ```json
+    {
+      "email": "alice@example.com",
+      "password": "password123"
+    }
+    ```
+
+- **POST /logout**
+    - Destroys the session and logs out the user.
 
 ### Quiz Management
 
-- **POST /quizzes** - Allows authenticated teachers to create a new quiz.
-- **GET /quizzes** - Retrieves all quizzes created by the logged-in teacher.
+- **POST /quizzes**
+    - Allows authenticated teachers to create a new quiz.
+    - Requires API key.
+    - Example:
+    ```json
+    {
+      "name": "General Knowledge Quiz",
+      "teacher_id": 1
+    }
+    ```
+
+- **GET /quizzes**
+    - Retrieves all quizzes created.
 
 ### Question Management
 
-- **POST /quizzes/{quiz_id}/questions** - Adds questions to a specified quiz.
-- **GET /quizzes/{quiz_id}/questions** - Retrieves questions for a specified quiz.
+- **POST /quizzes/{quiz_id}/questions**
+    - Adds questions to a specified quiz.
+    - Requires API key.
+    - Example (MC):
+    ```json
+    {
+      "question_text": "What is the capital of France?",
+      "question_type": "MC",
+      "options": ["Paris", "London", "Rome"],
+      "answer": "Paris"
+    }
+    ```
+
+- **GET /quizzes/{quiz_id}/questions**
+    - Retrieves questions for a specified quiz.
 
 ### Quiz Participation
 
-- **POST /join_quiz** - Allows students to join a quiz using a unique code.
-- **POST /quizzes/{quiz_id}/submit** - Allows students to submit their answers and calculates the score.
+- **POST /join_quiz**
+    - Allows students to join a quiz using a unique code.
+    - Example:
+    ```json
+    {
+      "quiz_code": "ABC123",
+      "name": "John"
+    }
+    ```
+
+- **POST /quizzes/{quiz_id}/submit**
+    - Allows students to submit their answers and calculates the score.
+    - Example:
+    ```json
+    {
+      "answers": {
+        "1": "Paris",
+        "2": "True"
+      }
+    }
+    ```
 
 ## Installation
 
@@ -41,9 +107,12 @@ To run this project locally, follow these steps:
 1. **Clone the repository:**
 `git clone https://github.com/jrveloya/quizzAppAPIFlask.git`
 2. **Build the Docker image:**
+`docker build -t quiz-app .`
+3. **Run the Docker container:**
 `docker run -p 5000:5000 quiz-app`
 
 ## Deployment on AWS EC2
+
 1. **Set up an EC2 instance** with Docker installed.
 2. **Pull the Docker image from Docker Hub:**
 `docker pull jrveloya/quiz-app`
@@ -71,5 +140,8 @@ GitHub Actions is used to automate the testing and deployment pipeline:
 - **Docker** - Used for containerization and deployment.
 - **AWS EC2** - Cloud platform for deployment.
 - **GitHub Actions** - CI/CD tool used for automated testing and deployment.
+"""
 
-
+path = Path("/mnt/data/README_with_Examples.md")
+path.write_text(readme_content)
+path
