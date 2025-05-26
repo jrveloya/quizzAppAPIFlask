@@ -1,7 +1,3 @@
-from pathlib import Path
-
-readme_content = """# Flask Quiz API
-
 ## Overview
 
 The Flask Quiz API is a web application that allows teachers to create and manage quizzes with different types of questions, and students to take quizzes using unique access codes. This project uses containerization for deployment, ensuring consistency across different environments and easy scalability. It is designed with security and best practices in mind, deploying on AWS EC2 using Docker.
